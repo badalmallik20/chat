@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <style>
+      body {
+        margin: 0 auto;
+        max-width: 800px;
+        padding: 0 20px;
+      }
+      
+      .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+      }
+      
+      .darker {
+        border-color: #ccc;
+        background-color: #ddd;
+      }
+      
+      .container::after {
+        content: "";
+        clear: both;
+        display: table;
+      }
+      
+      .container img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+      }
+      
+      .container img.right {
+        float: right;
+        margin-left: 20px;
+        margin-right:0;
+      }
+      
+      .time-right {
+        float: right;
+        color: #aaa;
+      }
+      
+      .time-left {
+        float: left;
+        color: #999;
+      }
+      </style>
+</head>
+<body>
+  <a href="/logout"><button type="button" class="btn btn-danger">Logout</button></a> 
+<div class="container-fluid ">
+  <div class="row">
+    <div  class="col-md-6">
+      <h2>Chat Received</h2>
+      <div id="recivedMessages"></div>
+      <% for(var i=0; i < data.getRecivedChat.length; i++) { %>
+        <div class="container">
+          <p>From:<b><%=data.getRecivedChat[i].userData[0].name%></b>(<%=data.getRecivedChat[i].userData[0].email%>)</p>
+          <p><%=data.getRecivedChat[i].message%></p>
+        </div>
+      <% } %>
+    </div>
+
+    <div  class="col-md-6">
+      <h2>Chat Send</h2>
+      <div id="sendMessages"></div>
+      <% for(var i=0; i < data.getSendChat.length; i++) { %>
+        <div class="container">
+          <p>To:<b><%=data.getSendChat[i].userData1[0].name%></b>(<%=data.getSendChat[i].userData1[0].email%>)</p>
+          <p><%=data.getSendChat[i].message%></p>
+        </div>
+      <% } %>
+      <div id="sendMessages"></div>
+    </div>
+
+    <div  class="col-md-6">
+      <h2>Users List</h2>            
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for(var i=0; i < data.getUsers.length; i++) { %>
+          <tr>
+            <td><%=data.getUsers[i].name%></td>
+            <td><%=data.getUsers[i].email%></td>
+            <td><button type="button" class="btn btn-primary" onclick="chatPopup('<%=data.getUsers[i]._id%>','<%=data.getUsers[i].name%>');">Chat</button></td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-md-6 jumbotron">
+      <h2 id="sendName"></h2>
+      <input type="hidden" id = "id">
+      <textarea id = "message" class="form-control" placeholder="Your Message Here"></textarea>
+      <br>
+      <button id="send" class="btn btn-success">Send</button>
+    </div>
+   
+    
+   </div>
+  </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    $('.jumbotron').hide();
+    var socket = io();
+    socket.on("message", addMessages) 
+    $(() => {
+      $("#send").click(()=>{
+        sendMessage({
+          id: $("#id").val(), 
+          message:$("#message").val()
+        });
+        $("#message").val('');
+      })
+    })
+      
+    function addMessages(message){
+      if(message.userData[0].email=='<%=userEmail%>' ){
+        $("#sendMessages").append(`<div class="container"><p>To:<b>${message.userData1[0].name}</b>(${message.userData1[0].email})</p><p>${message.message}</p></div>`);
+      }
+      if(message.userData1[0].email=='<%=userEmail%>' ){
+        $("#recivedMessages").append(`<div class="container"><p>To:<b>${message.userData[0].name}</b>(${message.userData[0].email})</p><p>${message.message}</p></div>`);
+      }
+    }
+  
+    function sendMessage(message){
+      $.post(window.location.origin+"/messages", message)
+    }
+
+    function chatPopup(id,name){
+      $('#id').val(id);
+      $('#sendName').html('Send Message to '+name);
+      $('.jumbotron').fadeIn();
+    }
+</script>
+</body>
+</html>

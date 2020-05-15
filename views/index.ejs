@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bootstrap Simple Login Form</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+<style type="text/css">
+	.login-form {
+		width: 340px;
+    	margin: 50px auto;
+	}
+    .login-form form {
+    	margin-bottom: 15px;
+        background: #f7f7f7;
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+    }
+    .login-form h2 {
+        margin: 0 0 15px;
+    }
+    .form-control, .btn {
+        min-height: 38px;
+        border-radius: 2px;
+    }
+    .btn {        
+        font-size: 15px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+<div class="login-form" id="loginBox">
+    <div>
+        <h2 class="text-center">Log in</h2>       
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="email" id="email" required="required">
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" placeholder="Password" id="password" required="required">
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-primary btn-block" onclick="login();">Log in</button>
+        </div>       
+    </div>
+    <p class="text-center" id="createProfile"><a href="javascript:;">Create an Account</a></p>
+</div>
+<div class="login-form" id="createBox">
+    <div>
+        <h2 class="text-center">Sign Up</h2> 
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="name" id="name" required="required">
+        </div>      
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="email" id="aEmail" required="required">
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" placeholder="Password" id="aPassword" required="required">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block" onclick="signUp();">Sign Up</button>
+        </div>       
+    </div>
+    <p class="text-center" id="loginForm"><a href="javascript:;">Login</a></p>
+</div>
+<script>
+    var origin   = window.location.origin;
+    $('#createBox').hide();
+    $('#loginBox').fadeIn();
+    $('#createProfile').click(function(){
+        $('#loginBox').hide();
+        $('#createBox').fadeIn();
+    });
+    $('#loginForm').click(function(){
+        $('#createBox').hide();
+        $('#loginBox').fadeIn();
+    });
+    var emailRegex = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+    function login(){
+        var email = $.trim($("#email").val());
+        var password = $.trim($("#password").val());
+        if (email ==""){
+            return alert("Email is required.")
+        }
+        else if(!emailRegex.test(email)){
+            return alert("Please enter valid email.");
+        }
+        else if (password ==""){
+            return alert("Password is required.");
+        }
+        else if(password.length <8){
+            return alert("Password should contain 8 characters.");
+        }
+        else{
+            var url ='/login';
+            var data = {
+                email:email,
+                password:password,
+            };
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: data,
+                success: function (data) {
+                    if (data == 1) {
+                        window.location.href = origin+'/chats';
+                    }else if(data == 2){
+                        alert("This email id is not registered.");
+                    }else if(data == 3){
+                        alert("Incorrect Password.");
+                    }
+                    else{
+                        alert("Something went wrong.");
+                    }
+                },
+                error: function (data){
+                    alert("Something went wrong.");
+                }
+            }); 
+        }
+    }
+    function signUp(){
+        var name = $.trim($("#name").val());
+        var email = $.trim($("#aEmail").val());
+        var password = $.trim($("#aPassword").val());
+        if (name ==""){
+            return alert("Name is required.")
+        }
+        else if (email ==""){
+            return alert("Email is required.")
+        }
+        else if(!emailRegex.test(email)){
+            return alert("Please enter valid email.");
+        }
+        else if (password ==""){
+            return alert("Password is required.");
+        }
+        else if(password.length <8){
+            return alert("Password should contain 8 characters.");
+        }
+        else{
+            var url ='/addUser';
+            var data = {
+                name:name,
+                email:email,
+                password:password,
+            };
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: data,
+                success: function (data) {
+                    if (data == 1) {
+                        location.reload();
+                    }else if(data == 4){
+                        alert("This email id is already registered.");
+                    }
+                    else{
+                        alert("Something went wrong.");
+                    }
+                },
+                error: function (data){
+                    alert("Something went wrong.");
+                }
+            }); 
+        }
+    }
+</script>
+</body>
+</html>                                		                            
