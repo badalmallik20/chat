@@ -19,6 +19,6 @@
     "joi": "^14.3.1",
     "mongoose": "^5.9.14",
     "objectid": "^3.2.1",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.5.0"
   }
 }
